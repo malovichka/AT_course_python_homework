@@ -1,20 +1,32 @@
 import string
 
 
-def letters_count(text: str) -> tuple[str, int]:
+def letters_count(text: str) -> str:
     """This function counts how many times word 'Python' is used in the given text,
     and finds the letter that is used most often. Case is ignored, as well as
-    punctuation marks, special characters, spaces and newlines"""
+    punctuation marks, special characters, spaces and newlines
+    Args:
+    text (str) - text in which function will search for the letter with highest occurance
+    """
 
-    python_count = text.lower().count("python")
     most_often_count = 0
     most_often_letter = ""
+    text_lower = text.lower()
     for letter in string.ascii_lowercase:
-        letter_count = text.lower().count(letter)
+        letter_count = text_lower.count(letter)
         if letter_count > most_often_count:
             most_often_count = letter_count
             most_often_letter = letter
-    return most_often_letter, python_count
+    return most_often_letter
+
+
+def python_count(text: str) -> int:
+    """This function counts how many times word 'Python' is used in the given text
+    Args:
+    text (str) - text in which function will count non-overlapping appearance of word 'python'
+    """
+
+    return text.lower().count("python")
 
 
 if __name__ == "__main__":
@@ -33,4 +45,4 @@ if __name__ == "__main__":
     development model, as do nearly all of Python's other implementations. Python 
     and CPython are managed by the non-profit Python Software Foundation.
     """
-    print(letters_count(text))
+    print(letters_count(text=text), python_count(text=text))

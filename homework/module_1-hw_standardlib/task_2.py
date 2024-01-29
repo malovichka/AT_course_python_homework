@@ -1,20 +1,25 @@
 import re
 
 
-def check_ip(ip_address) -> bool:
-    """This function validates the given ip address and returns True if it's valid IPv4, otherwise False"""
-    is_valid = True
+def check_ip(ip_address: str | int) -> bool:
+    """This function validates the given ip address and returns True if it's valid IPv4, otherwise False
+    Args:
+    ip_adress (str, int) - piece of data that will be validated if it's valid ip address
+    """
+
+    # checking if given data matches the common pattern characteristic of an ip_address
     ip_address_pattern_match = re.match(
         r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}", str(ip_address)
     )
+    if not bool(ip_address_pattern_match):
+        return False
+    # checking that number of bytes in each slot is less than 256
+    ip_address_bytes = [int(bytes) < 256 for bytes in ip_address.split(".")]
 
-    if bool(ip_address_pattern_match):
-        ip_address_bytes = [int(bytes) < 256 for bytes in ip_address.split(".")]
+    if not all(ip_address_bytes):
+        return False
 
-    if not bool(ip_address_pattern_match) or not all(ip_address_bytes):
-        is_valid = False
-
-    return is_valid
+    return True
 
 
 if __name__ == "__main__":

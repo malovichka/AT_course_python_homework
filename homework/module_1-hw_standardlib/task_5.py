@@ -5,7 +5,9 @@ import prettytable
 
 
 def directory_content(directory: str):
-    """This function takes a path to a directory as an argument and prints a table with its contents and their data"""
+    """This function takes a path to a directory as an argument and prints a table with its contents and their data
+    Args:
+    directory (str) - path to a directory for which  contents will be displayed"""
 
     content_table = prettytable.PrettyTable()
     content_table.field_names = ["Mode", "Owner", "Group", "Size", "File name"]
@@ -26,9 +28,8 @@ def directory_content(directory: str):
 
 
 def parse_cmd_args():
-    path_help = "Path to a folder"
     parser = argparse.ArgumentParser()
-    parser.add_argument("path", help=path_help)
+    parser.add_argument("path", help="Path to a folder")
 
     if len(sys.argv) <= 1:
         parser.print_help(sys.stderr)

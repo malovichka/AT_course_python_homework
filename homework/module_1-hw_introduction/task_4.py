@@ -2,18 +2,18 @@ import sys
 
 
 def file_size(size_in_bytes: int) -> str:
-    """This function converts given in bytes size of the file to kilobytes, megabytes or gigabytes"""
+    """This function converts given in bytes size of the file to kilobytes, megabytes or gigabytes
+    Args:
+    size_in_bytes (int) - size of the file in bytes"""
     measures = ["B", "Kb", "Mb", "Gb"]
     i = 0
-    converted = 0
     if size_in_bytes < 1024:
-        converted = float(size_in_bytes)
+        pass
     else:
-        while size_in_bytes >= 1024 and i < 3:
-            converted = round(size_in_bytes / 1024, 1)
+        while size_in_bytes >= 1024 and i < len(measures) - 1:
             size_in_bytes /= 1024
             i += 1
-    return f"{converted}{measures[i]}"
+    return f"{size_in_bytes:.1f}{measures[i]}"
 
 
 if __name__ == "__main__":

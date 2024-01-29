@@ -1,5 +1,7 @@
 def list_filtering_with_for_loop(unfiltered: list) -> list[int]:
-    """This function filters only integers USING FOR LOOP from given list and returns results in new list"""
+    """This function filters only integers USING FOR LOOP from given list and returns results in new list
+    Args:
+    unfiltered (list) - list elements of various data types"""
     filtered = []
     for i in unfiltered:
         if isinstance(i, int):
@@ -9,17 +11,19 @@ def list_filtering_with_for_loop(unfiltered: list) -> list[int]:
 
 
 def list_filtering_with_list_comprehensions(unfiltered: list) -> list[int]:
-    """This function filters only integers USING LIST COMPREHENSIONS from given list and returns results in new list"""
-    filtered = [i for i in unfiltered if isinstance(i, int)]
+    """This function filters only integers USING LIST COMPREHENSIONS from given list and returns results in new list
+    Args:
+    unfiltered (list) - list elements of various data types"""
 
-    return filtered
+    return [i for i in unfiltered if isinstance(i, int)]
 
 
 def list_filtering_with_filter_and_lambda(unfiltered: list) -> list[int]:
-    """This function filters only integers USING FILTER() AND LAMBDA from given list and returns results in new list"""
-    filtered = list(filter(lambda i: isinstance(i, int), unfiltered))
+    """This function filters only integers USING FILTER() AND LAMBDA from given list and returns results in new list
+    Args:
+    unfiltered (list) - list elements of various data types"""
 
-    return filtered
+    return list(filter(lambda i: isinstance(i, int), unfiltered))
 
 
 if __name__ == "__main__":
