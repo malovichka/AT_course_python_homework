@@ -4,18 +4,27 @@ import abc
 # Implement all methods where `NotImplementedError` is raised
 
 
+ENGINEER_SALARY = 10
+MANAGER_SALARY = 12
+
+
 class Company(object):
     """Represents a company"""
 
-    def __init__(self, name, address=None):
+    reward = 5
+
+    def __init__(self, name: str, address: str = None):
         self.name = name
         self.address = address
         self.employees: list["Employee"] = list()
         self.__money = 1000
 
-    def add_employee(self, employee):
+    def add_employee(self, employee: "Employee"):
         # make sure employee is an instance of Engineer or Manager
         # make sure he is not employed already
+        if self.is_bankrupt:
+            raise CompanyIsBankruptException("Company is bankrupt")
+
         if not isinstance(employee, (Engineer, Manager)):
             raise WrongEmployeeTypeException("Employee is not qualified for employment")
 
@@ -24,7 +33,7 @@ class Company(object):
 
         self.employees.append(employee)
 
-    def dismiss_employee(self, employee: "Employee", should_remove=True):
+    def dismiss_employee(self, employee: "Employee", should_remove: bool = True):
         """
         Dismisses an employee. Employee must be a company member.
         Company should notify employee that he/she was dismissed
@@ -45,7 +54,7 @@ class Company(object):
             print(str(e))
 
     # added this method to remove code duplication in do_tasks and write_reports
-    def _pay_employee(self, employee: "Employee", amount):
+    def _pay_employee(self, employee: "Employee", amount: int):
         """Method is called when company gives any kind of compensation to employee"""
         if not self.is_bankrupt:
             self.__money -= amount
@@ -53,55 +62,51 @@ class Company(object):
         if self.is_bankrupt:
             self.go_bankrupt()
 
-    def do_tasks(self, employee):
+    def do_tasks(self, employee: "Employee"):
         """
         Engineer should call this method when he is working.
         Company should withdraw 10 money from a personal account and return
         them to engineer. That will be a payment
         :rtype: int
         """
-        # make sure engineer is employed to this company
-        # check employee is Engineer
-        if employee not in self.employees:
-            raise EmployeeNotFoundException("There is no such employee hired")
 
-        if not isinstance(employee, Engineer):
-            raise WrongEmployeeTypeException("Employee is not qualified for employment")
+        self.submit_work_results(employee, Engineer, ENGINEER_SALARY)
 
-        self._pay_employee(employee, 10)
-
-    def write_reports(self, employee):
+    def write_reports(self, employee: "Employee"):
         """
         Manager should call this method when he is working.
         Company should withdraw 12 money from a personal account and return
         them to manager. That will be a payment
         :rtype: int
         """
-        # make sure manager is employed to this company
-        # check employee is Manage
+
+        self.submit_work_results(employee, Manager, MANAGER_SALARY)
+
+    def submit_work_results(
+        self, employee: "Employee", employee_role: "Employee", salary: int
+    ):
+        # make sure engineer is employed to this company
+        # check employee is qualified for the job
         if employee not in self.employees:
             raise EmployeeNotFoundException("There is no such employee hired")
-
-        if not isinstance(employee, Manager):
+        if not isinstance(employee, employee_role):
             raise WrongEmployeeTypeException("Employee is not qualified for employment")
-
-        self._pay_employee(employee, 12)
+        self._pay_employee(employee, salary)
 
     def make_a_party(self):
         """Party time! All employees get 5 money"""
         # make sure a company is not a bankrupt before and after the party
         # call employee.bonus_to_salary()
         if not self.is_bankrupt:
-            reward = 5
             for employee in self.employees:
-                employee.bonus_to_salary(reward)
-                self.__money -= reward
+                employee.bonus_to_salary(self, Company.reward)
+                self.__money -= Company.reward
         if self.is_bankrupt:
             self.go_bankrupt()
 
     def show_money(self):
         """Displays amount of money that company has"""
-        print(self.__money)
+        print(f"{self.name} got {self.__money} currency unit(s)")
 
     def go_bankrupt(self):
         """
@@ -125,7 +130,7 @@ class Company(object):
 class Person(object):
     """Represents any person"""
 
-    def __init__(self, name, age, sex=None, address=None):
+    def __init__(self, name: str, age: int, sex: str = None, address: str = None):
         self.name = name
         self.age = age
         self.sex = sex if sex is not None else "<not specified>"
@@ -138,7 +143,7 @@ class Person(object):
 class Employee(Person):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, name, age, sex=None, address=None):
+    def __init__(self, name: str, age: int, sex: str = None, address: str = None):
         super(Employee, self).__init__(name, age, sex, address)
         self.company = None
         self.__money = 0
@@ -150,30 +155,35 @@ class Employee(Person):
             self.company = company
         except (WrongEmployeeTypeException, EmployeeAlreadyHiredException) as e:
             print(f"{self.name}: " + str(e))
+        except CompanyIsBankruptException as err:
+            print(f"{company.name}: " + str(err))
 
     def become_unemployed(self):
         """Leave current company"""
-        if self.is_employed:
+        try:
             self.company.notify_im_leaving(self)
+        except AttributeError:
+            print(f"{self.name} is not employed")
 
     def notify_dismissed(self):
         """Company should call this method when dismissing an employee"""
         self.company = None
 
-    def bonus_to_salary(self, company, reward=5):
+    def bonus_to_salary(self, company: Company, reward=5):
         """
         Company should call this method on each employee when having a party
         """
         # make sure person is employed to same company
-        # money + 5        if self.company == company:
-        self.put_money_into_my_wallet(reward)
+        # money + 5
+        if self.company == company:
+            self.put_money_into_my_wallet(reward)
 
     @property
     def is_employed(self):
         """returns True or False"""
         return self.company is not None
 
-    def put_money_into_my_wallet(self, amount):
+    def put_money_into_my_wallet(self, amount: int):
         """Adds the indicated amount of money to persons budget"""
         # Engineer and Manager will have to use this method to store their
         # salary, because __money is a private attribute
@@ -181,7 +191,7 @@ class Employee(Person):
 
     def show_money(self):
         """Shows how much money person has earned"""
-        print(self.__money)
+        print(f"{self.name} got {self.__money} currency unit(s)")
 
     @abc.abstractmethod
     def do_work(self):
@@ -219,6 +229,10 @@ class WrongEmployeeTypeException(Exception):
 
 
 class EmployeeNotFoundException(Exception):
+    pass
+
+
+class CompanyIsBankruptException(Exception):
     pass
 
 
